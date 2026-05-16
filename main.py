@@ -4,6 +4,7 @@ import queue
 import sys
 
 from tuner.dsp import apply_window, compute_fft, harmonic_product_spectrum
+from tuner.dsp import freq_to_note
 
 SAMPLE_RATE = 44100   
 BUFFER_SIZE = 2048    # Low buffer size keeping latency low (~46ms)
@@ -18,19 +19,6 @@ def audio_callback(indata, frames, time, status):
     # Push mono channel data into the queue
     audio_queue.put(indata[:, 0].copy())
 
-
-
-NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-
-def freq_to_note(frequency):
-    if frequency <= 0:
-        return None, 0
-    n = 12 * np.log2(frequency / 440.0) + 69
-    midi_note = int(round(n))
-    cents_off = (n - midi_note) * 100
-    note_name = NOTE_NAMES[midi_note % 12]
-    octave = (midi_note // 12) - 1
-    return f"{note_name}{octave}", cents_off
 
 def process(audio_buffer):
     if np.max(np.abs(audio_buffer)) < 0.01:
