@@ -3,6 +3,8 @@ import sounddevice as sd
 import queue
 import sys
 
+from tuner.dsp import apply_window, compute_fft, harmonic_product_spectrum
+
 SAMPLE_RATE = 44100   
 BUFFER_SIZE = 2048    # Low buffer size keeping latency low (~46ms)
 N_FFT = 16384         # Zero-padded FFT size for high frequency resolution
@@ -16,25 +18,7 @@ def audio_callback(indata, frames, time, status):
     # Push mono channel data into the queue
     audio_queue.put(indata[:, 0].copy())
 
-def apply_window(audio_buffer):
-    return audio_buffer * np.hanning(len(audio_buffer))
 
-def compute_fft(windowed_buffer, sample_rate, n_fft):
-    # Pass n=N_FFT to automatically zero-pad the buffer
-    spectrum = np.abs(np.fft.rfft(windowed_buffer, n=n_fft))
-    freqs = np.fft.rfftfreq(n_fft, d=1.0 / sample_rate)
-    return spectrum, freqs
-
-def harmonic_product_spectrum(spectrum, num_harmonics=4):
-    # Limit the max length to prevent array sizing mismatches during downsampling
-    max_len = len(spectrum) // num_harmonics
-    hps = spectrum[:max_len].copy()
-    
-    for h in range(2, num_harmonics + 1):
-        downsampled = spectrum[::h][:max_len]
-        hps *= downsampled
-        
-    return hps
 
 NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
