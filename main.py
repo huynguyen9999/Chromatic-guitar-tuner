@@ -90,6 +90,7 @@ def process(audio_buffer):
 
     note, cents = freq_to_note(fundamental_freq)
     print(f"{note:<5} | {fundamental_freq:7.1f} Hz | {cents:+6.1f} cents")
+    # if between +- 5 cents, you're in tune!
 
 # Start the audio stream
 stream = sd.InputStream(
