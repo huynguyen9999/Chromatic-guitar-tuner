@@ -51,10 +51,13 @@ The underlying Python audio stream wrapper requires the cross-platform `PortAudi
   brew install portaudio
 
   sudo apt-get update
+  
+bash
 sudo apt-get install libportaudio2
 
-
+bash
 python -m pip install sounddevice numpy
+
 
 ## Usage
 python tuner.py
