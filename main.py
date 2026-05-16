@@ -1,6 +1,7 @@
 import numpy as np
 
-from tuner.dsp import apply_window, compute_fft, harmonic_product_spectrum, freq_to_note
+from tuner.dsp import apply_window, compute_fft, harmonic_product_spectrum
+from tuner.music import freq_to_note
 from tuner.audio import audio_queue, stream, SAMPLE_RATE
 
 N_FFT = 16384         # Zero-padded FFT size for high frequency resolution
