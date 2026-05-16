@@ -6,9 +6,6 @@ from tuner.audio import audio_queue, stream, SAMPLE_RATE
 
 N_FFT = 16384         # Zero-padded FFT size for high frequency resolution
 
-# Thread-safe queue to pass audio from the microphone callback to the main loop
-audio_queue = queue.Queue()
-
 
 def process(audio_buffer):
     if np.max(np.abs(audio_buffer)) < 0.01:
@@ -52,7 +49,6 @@ def process(audio_buffer):
 
     note, cents = freq_to_note(fundamental_freq)
     print(f"{note:<5} | {fundamental_freq:7.1f} Hz | {cents:+6.1f} cents")
-    # if between +- 5 cents, you're in tune!
 
 
 if __name__ == "__main__":
