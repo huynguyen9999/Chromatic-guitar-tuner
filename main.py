@@ -1,23 +1,12 @@
 import numpy as np
-import sounddevice as sd
-import queue
-import sys
 
-from tuner.dsp import apply_window, compute_fft, harmonic_product_spectrum
-from tuner.dsp import freq_to_note
+from tuner.dsp import apply_window, compute_fft, harmonic_product_spectrum, freq_to_note
+from tuner.audio import audio_queue, stream, SAMPLE_RATE
 
-SAMPLE_RATE = 44100   
-BUFFER_SIZE = 2048    # Low buffer size keeping latency low (~46ms)
 N_FFT = 16384         # Zero-padded FFT size for high frequency resolution
 
 # Thread-safe queue to pass audio from the microphone callback to the main loop
 audio_queue = queue.Queue()
-
-def audio_callback(indata, frames, time, status):
-    if status:
-        print(status, file=sys.stderr)
-    # Push mono channel data into the queue
-    audio_queue.put(indata[:, 0].copy())
 
 
 def process(audio_buffer):
@@ -64,20 +53,15 @@ def process(audio_buffer):
     print(f"{note:<5} | {fundamental_freq:7.1f} Hz | {cents:+6.1f} cents")
     # if between +- 5 cents, you're in tune!
 
-# Start the audio stream
-stream = sd.InputStream(
-    samplerate=SAMPLE_RATE,
-    channels=1,
-    blocksize=BUFFER_SIZE,
-    callback=audio_callback
-)
 
-print("Tuner started. Pluck a string... (Press Ctrl+C to stop)")
-with stream:
-    try:
-        while True:
-            # Block until a new audio buffer frame is ready
-            buffer_data = audio_queue.get()
-            process(buffer_data)
-    except KeyboardInterrupt:
-        print("\nStopping Tuner.")
+if __name__ == "__main__":
+    print("Tuner started. Pluck a string... (Press Ctrl+C to stop)")
+    
+    with stream:
+        try:
+            while True:
+                # Block until a new audio buffer frame is ready
+                buffer_data = audio_queue.get()
+                process(buffer_data)
+        except KeyboardInterrupt:
+            print("\nStopping Tuner.")
